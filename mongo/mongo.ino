@@ -11,12 +11,12 @@
 #include <ESP8266WiFi.h>
 #include <Hash.h>
 #include <ESPAsyncTCP.h>
-#include <ESPWebServer.h>
+#include <ESP8266WebServer.h>
 #endif
 #include <WiFiManager.h>
 #include <Adafruit_Sensor.h>
 #include <DHT.h>
-#include <HTTPClient.h>
+#include <ESP8266HTTPClient.h>
 #include "secrets.h"
 #include <ArduinoJson.h>
 // Variable as required in source
@@ -27,9 +27,9 @@ int phval = 0;
 unsigned long int avgval;
 String macAdd = "";
 
-RTC_DATA_ATTR int bootCount = 0;
-RTC_DATA_ATTR char name[15] = CLIENT;
-int LED_BUILTIN = 4;
+ int bootCount = 0;
+ char name[15] = CLIENT;
+//int LED_BUILTIN = 4;
 StaticJsonDocument<500> doc;
 
 #define DHTPIN 2 // Digital pin connected to the DHT sensor
@@ -119,13 +119,13 @@ void POSTData()
 void getDevice()
 {
 
-  esp_sleep_wakeup_cause_t wakeup_reason;
-  wakeup_reason = esp_sleep_get_wakeup_cause();
+  //esp_sleep_wakeup_cause_t wakeup_reason;
+  //wakeup_reason = esp_sleep_get_wakeup_cause();
 
-  uint64_t chipid = ESP.getEfuseMac();                                                        // The chip ID is essentially its MAC address(length: 6 bytes).
-  Serial.printf("***ESP32 Chip ID = %04X%08X\n", (uint16_t)(chipid >> 32), (uint32_t)chipid); // print High 2 bytes
-  char buffer[200];
-  sprintf(buffer, "%04X%08X", (uint16_t)(chipid >> 32), (uint32_t)chipid);
+ // uint64_t chipid = ESP.getEfuseMac();                                                        // The chip ID is essentially its MAC address(length: 6 bytes).
+ // Serial.printf("***ESP32 Chip ID = %04X%08X\n", (uint16_t)(chipid >> 32), (uint32_t)chipid); // print High 2 bytes
+ // char buffer[200];
+  //sprintf(buffer, "%04X%08X", (uint16_t)(chipid >> 32), (uint32_t)chipid);
   // sprintf(buffer, "esp32%" PRIu64, ESP.getEfuseMac());
 
   // int vbatt_raw = 0;
@@ -141,9 +141,9 @@ void getDevice()
   doc[apNames]["RSSI"] = String(WiFi.RSSI());
   doc[apNames]["type"] = TYPE;
   doc[apNames]["name"] = name;
-  doc[apNames]["chipid"] = buffer;
+ // doc[apNames]["chipid"] = buffer;
   doc[apNames]["bootCount"] = bootCount;
-  doc[apNames]["wakeup_reason"] = String(wakeup_reason);
+  //doc[apNames]["wakeup_reason"] = String(wakeup_reason);
   // doc[apNames]["vbatt_raw"] = vbatt_raw;
   // doc[apNames]["vbatt"] = map(vbatt_raw, 0, 4096, 0, 4200);
 }
