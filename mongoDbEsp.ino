@@ -423,9 +423,9 @@ void POSTData()
 // Or, if you happy to ignore the SSL certificate, then use the following line instead:
 //  client->setInsecure();
 #if defined(ESP8266)
-    X509List cert("A8:28:BE:2D:7C:52:F0:DA:4C:BD:8B:99:87:16:32:BF:FA:DF:FD:C7");
+    X509List cert("FB:73:80:3E:5D:B0:D9:8D:80:B6:9D:D5:9E:E7:87:4F:C2:48:D9:CA");
     WiFiClientSecure client;
-    client.setFingerprint("A8:28:BE:2D:7C:52:F0:DA:4C:BD:8B:99:87:16:32:BF:FA:DF:FD:C7");
+    client.setFingerprint("FB:73:80:3E:5D:B0:D9:8D:80:B6:9D:D5:9E:E7:87:4F:C2:48:D9:CA");
 #elif defined(ESP32)
     WiFiClientSecure client;
 #endif
@@ -563,9 +563,9 @@ void controlLevel()
       // convert voltage value to tds value
       tdsValue = (133.42 * compensationVoltage * compensationVoltage * compensationVoltage - 255.86 * compensationVoltage * compensationVoltage + 857.39 * compensationVoltage) * 0.5;
 
-      // Serial.print("voltage:");
-      // Serial.print(averageVoltage,2);
-      // Serial.print("V   ");
+      Serial.print("voltage:");
+      Serial.print(analogRead(TdsSensorPin);, 2);
+      Serial.print("V   ");
       Serial.print("TDS Value:");
       Serial.print(tdsValue, 0);
       Serial.println("ppm");
