@@ -564,7 +564,7 @@ void controlLevel()
       tdsValue = (133.42 * compensationVoltage * compensationVoltage * compensationVoltage - 255.86 * compensationVoltage * compensationVoltage + 857.39 * compensationVoltage) * 0.5;
 
       Serial.print("voltage:");
-      Serial.print(analogRead(TdsSensorPin);, 2);
+      Serial.print(analogRead(TdsSensorPin), 2);
       Serial.print("V   ");
       Serial.print("TDS Value:");
       Serial.print(tdsValue, 0);
