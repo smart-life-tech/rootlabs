@@ -34,4 +34,5 @@ void loop()
   Serial.print("voltage mV:");
   Serial.print(analogRead(TdsSensorPin), 2);
   Serial.println("V   ");
+   delay(1000);
 }
