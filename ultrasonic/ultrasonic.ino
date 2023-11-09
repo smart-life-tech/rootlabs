@@ -1,6 +1,6 @@
 // Define Trig and Echo pin:
-#define trigPin D4
-#define echoPin D5
+#define trigPin  4
+#define echoPin  5
 int TdsSensorPin = A0;
 // Define variables:
 long duration;
