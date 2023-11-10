@@ -423,9 +423,9 @@ void POSTData()
 // Or, if you happy to ignore the SSL certificate, then use the following line instead:
 //  client->setInsecure();
 #if defined(ESP8266)
-    X509List cert("A8:28:BE:2D:7C:52:F0:DA:4C:BD:8B:99:87:16:32:BF:FA:DF:FD:C7");
+    X509List cert("98:3D:85:9C:9D:70:EF:5A:DC:3C:5C:F4:CA:82:37:77:32:FC:BE:D9");
     WiFiClientSecure client;
-    client.setFingerprint("A8:28:BE:2D:7C:52:F0:DA:4C:BD:8B:99:87:16:32:BF:FA:DF:FD:C7");
+    client.setFingerprint("98:3D:85:9C:9D:70:EF:5A:DC:3C:5C:F4:CA:82:37:77:32:FC:BE:D9");
 #elif defined(ESP32)
     WiFiClientSecure client;
 #endif
@@ -477,24 +477,24 @@ void POSTData()
             */
       if (phVal.toFloat() > ph1)
       {
-        digitalWrite(relay1, HIGH); // relay is to be on here
+        digitalWrite(relay1, LOW); // relay is to be on here
         Serial.println("pump 1 on ph value is higher");
       }
       else
       {
-        digitalWrite(relay1, LOW); // relay off pump also off
+        digitalWrite(relay1, HIGH); // relay off pump also off
       }
     }
     if (pump2 < 7)
     {
       if (phVal.toFloat() < ph2)
       {
-        digitalWrite(relay2, HIGH);
+        digitalWrite(relay2, LOW);
         Serial.println("pump 2 on ph value is lower");
       }
       else
       {
-        digitalWrite(relay2, LOW);
+        digitalWrite(relay2, HIGH);
       }
     }
     Serial.println(httpResponseCode);
@@ -562,15 +562,14 @@ void controlLevel()
 
       // convert voltage value to tds value
       tdsValue = (133.42 * compensationVoltage * compensationVoltage * compensationVoltage - 255.86 * compensationVoltage * compensationVoltage + 857.39 * compensationVoltage) * 0.5;
-
-      Serial.print("voltage:");
-      Serial.print(analogRead(TdsSensorPin), 2);
-      Serial.print("V   ");
-      Serial.print("TDS Value:");
-      Serial.print(tdsValue, 0);
-      Serial.println("ppm");
     }
   }
+  Serial.print("voltage:");
+  Serial.print(analogRead(TdsSensorPin), 2);
+  Serial.print("V   ");
+  Serial.print("TDS Value:");
+  Serial.print(tdsValue, 0);
+  Serial.println("ppm");
 }
 
 float getUltra()
@@ -645,14 +644,19 @@ void loop()
     getwater = height - getwater;            // the leftover is the real water height
     if (getwater > height)
       getwater = height;
-    Serial.print("water filled  level value ");
+    Serial.print("water filled  level value: ");
     Serial.println(getwater);
     if (pump3 < 7)
     {
-      if (getwater < pump) // stat pumping at a lower height set from ui
+      if (getwater > pump) // stat pumping at a lower height set from ui
+      {
+        Serial.println("pump on");
+      }
+      digitalWrite(relay3, LOW);
+      if (getwater < 5) // so as not to touch the sensor 5 inches minimum 5 inches is the 20 cm to stop pumping
+      {
         digitalWrite(relay3, HIGH);
-      if (getwater > 5) // so as not to touch the sensor 5 inches minimum 5 inches is the 20 cm to stop pumping
-        digitalWrite(relay3, LOW);
+      }
       digitalWrite(workingLed, HIGH);
     }
     getwater = getwater + 7;
