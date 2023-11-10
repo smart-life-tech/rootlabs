@@ -183,7 +183,7 @@ void setup_wifi_manager()
     macAdd.toCharArray(apNames, 30);
     Serial.println(apNames);
     wifiManager.autoConnect(apNames);
-    String newMac = "40:91:51:4E:B7:45"; // enter the mac address here
+    String newMac = "CC:50:E3:C3:C7:0A"; // enter the mac address here
     newMac.toCharArray(apNames, 30);
     Serial.print("the mother ap name is ");
     Serial.println(apNames);
@@ -199,7 +199,7 @@ void setup_wifi_manager()
     macAdd.toCharArray(apNames, 30);
     Serial.println(apNames);
     wifiManager.autoConnect(apNames);
-    String newMac = "40:91:51:4E:B7:45"; // enter the mac address here
+    String newMac = "CC:50:E3:C3:C7:0A"; // enter the mac address here
     newMac.toCharArray(apNames, 30);
     Serial.print("the mother ap name is ");
     Serial.println(apNames);
@@ -423,9 +423,9 @@ void POSTData()
 // Or, if you happy to ignore the SSL certificate, then use the following line instead:
 //  client->setInsecure();
 #if defined(ESP8266)
-    X509List cert("FB:73:80:3E:5D:B0:D9:8D:80:B6:9D:D5:9E:E7:87:4F:C2:48:D9:CA");
+    X509List cert("A8:28:BE:2D:7C:52:F0:DA:4C:BD:8B:99:87:16:32:BF:FA:DF:FD:C7");
     WiFiClientSecure client;
-    client.setFingerprint("FB:73:80:3E:5D:B0:D9:8D:80:B6:9D:D5:9E:E7:87:4F:C2:48:D9:CA");
+    client.setFingerprint("A8:28:BE:2D:7C:52:F0:DA:4C:BD:8B:99:87:16:32:BF:FA:DF:FD:C7");
 #elif defined(ESP32)
     WiFiClientSecure client;
 #endif
