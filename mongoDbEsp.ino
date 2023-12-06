@@ -180,11 +180,12 @@ void setup_wifi_manager()
     // WIFI_MANAGER_STATION_NAME = macAdd;
     // char  * apNames = macAdd.c_str();
     // char apNames[30];
+    String newMac = "CC:50:E3:C3:C7:0A"; // enter the mac address here
+    newMac.toCharArray(apNames, 30);
     macAdd.toCharArray(apNames, 30);
     Serial.println(apNames);
     wifiManager.autoConnect(apNames);
-    String newMac = "CC:50:E3:C3:C7:0A"; // enter the mac address here
-    newMac.toCharArray(apNames, 30);
+
     Serial.print("the mother ap name is ");
     Serial.println(apNames);
     // doc["device"]["APname"] = apNames;
@@ -196,11 +197,12 @@ void setup_wifi_manager()
     // WIFI_MANAGER_STATION_NAME = macAdd;
     // char  * apNames = macAdd.c_str();
     // char apNames[30];
+    String newMac = "CC:50:E3:C3:C7:0A"; // enter the mac address here
+    newMac.toCharArray(apNames, 30);
     macAdd.toCharArray(apNames, 30);
     Serial.println(apNames);
     wifiManager.autoConnect(apNames);
-    String newMac = "CC:50:E3:C3:C7:0A"; // enter the mac address here
-    newMac.toCharArray(apNames, 30);
+
     Serial.print("the mother ap name is ");
     Serial.println(apNames);
   }
