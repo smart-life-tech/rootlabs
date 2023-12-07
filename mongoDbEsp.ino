@@ -104,7 +104,7 @@ String macAdd = "";
 int bootCount = 0;
 char name[15] = CLIENT;
 // int LED_BUILTIN = 4;
-StaticJsonDocument<500> doc;
+StaticJsonDocument<1000> doc;
 
 #define DHTPIN 2 // Digital pin connected to the DHT sensor
 
@@ -180,7 +180,7 @@ void setup_wifi_manager()
     // WIFI_MANAGER_STATION_NAME = macAdd;
     // char  * apNames = macAdd.c_str();
     // char apNames[30];
-    String newMac = "CC:50:E3:C3:C7:0A"; // enter the mac address here
+    String newMac = "8C:AA:B5:C7:C9:E9"; // enter the mac address here
     newMac.toCharArray(apNames, 30);
     macAdd.toCharArray(apNames, 30);
     Serial.println(apNames);
@@ -197,7 +197,7 @@ void setup_wifi_manager()
     // WIFI_MANAGER_STATION_NAME = macAdd;
     // char  * apNames = macAdd.c_str();
     // char apNames[30];
-    String newMac = "CC:50:E3:C3:C7:0A"; // enter the mac address here
+    String newMac = "8C:AA:B5:C7:C9:E9"; // enter the mac address here
     newMac.toCharArray(apNames, 30);
     macAdd.toCharArray(apNames, 30);
     Serial.println(apNames);
@@ -622,7 +622,7 @@ void setup()
   // digitalWrite(relay1, LOW);
   // digitalWrite(relay2, LOW);
   //  digitalWrite(relay3, LOW);
-  //  digitalWrite(relay4, LOW);
+    digitalWrite(relay4, LOW);
 }
 
 void loop()
