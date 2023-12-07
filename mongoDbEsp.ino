@@ -62,7 +62,7 @@ int MUXPinS3 = D7;
 
 int relay1 = D0; //
 int relay2 = D1; // water, int
-int relay3 = D3; // ph2 , int 2 d3 is water pump
+int relay3 = D2; // ph2 , int 2 d3 is water pump
 int relay4 = D2; // ph1 relay, int 1
                  // Define Trig and Echo pin:
 
