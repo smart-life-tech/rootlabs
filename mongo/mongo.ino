@@ -95,7 +95,7 @@ void POSTData()
     X509List cert("0A:C5:5E:61:CD:83:C4:B1:12:16:5D:61:41:6D:C9:C8:CA:7A:F9:D8");
     WiFiClientSecure client;
     client.setFingerprint("0A:C5:5E:61:CD:83:C4:B1:12:16:5D:61:41:6D:C9:C8:CA:7A:F9:D8");
-    client.setCACert(test_root_ca);
+     client.setCACert(test_root_ca);
 #elif defined(ESP32)
     WiFiClientSecure client;
     client.setCACert(test_root_ca);
