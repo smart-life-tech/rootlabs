@@ -91,9 +91,9 @@ void POSTData()
   if (WiFi.status() == WL_CONNECTED)
   {
 #if defined(ESP8266)
-    X509List cert("A8:28:BE:2D:7C:52:F0:DA:4C:BD:8B:99:87:16:32:BF:FA:DF:FD:C7");
+    X509List cert("0A:C5:5E:61:CD:83:C4:B1:12:16:5D:61:41:6D:C9:C8:CA:7A:F9:D8");
     WiFiClientSecure client;
-    client.setFingerprint("A8:28:BE:2D:7C:52:F0:DA:4C:BD:8B:99:87:16:32:BF:FA:DF:FD:C7");
+    client.setFingerprint("0A:C5:5E:61:CD:83:C4:B1:12:16:5D:61:41:6D:C9:C8:CA:7A:F9:D8");
 #elif defined(ESP32)
     WiFiClientSecure client;
 #endif
