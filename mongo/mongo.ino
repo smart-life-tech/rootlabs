@@ -13,6 +13,7 @@
 #include <ESPAsyncTCP.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266HTTPClient.h>
+#include <WiFiClientSecureBearSSL.h>
 #endif
 #include <WiFiManager.h>
 #include <Adafruit_Sensor.h>
@@ -28,9 +29,9 @@ int phval = 0;
 unsigned long int avgval;
 String macAdd = "";
 
- int bootCount = 0;
- char name[15] = CLIENT;
-//int LED_BUILTIN = 4;
+int bootCount = 0;
+char name[15] = CLIENT;
+// int LED_BUILTIN = 4;
 StaticJsonDocument<500> doc;
 
 #define DHTPIN 2 // Digital pin connected to the DHT sensor
@@ -93,9 +94,9 @@ void POSTData()
   {
 #if defined(ESP8266)
     X509List cert("0A:C5:5E:61:CD:83:C4:B1:12:16:5D:61:41:6D:C9:C8:CA:7A:F9:D8");
-    WiFiClientSecure client;
+    BearSSL::WiFiClientSecure client;
     client.setFingerprint("0A:C5:5E:61:CD:83:C4:B1:12:16:5D:61:41:6D:C9:C8:CA:7A:F9:D8");
-     client.setCACert(test_root_ca);
+    client.setTrustAnchors(new BearSSL::X509List(test_root_ca));
 #elif defined(ESP32)
     WiFiClientSecure client;
     client.setCACert(test_root_ca);
@@ -122,13 +123,13 @@ void POSTData()
 void getDevice()
 {
 
-  //esp_sleep_wakeup_cause_t wakeup_reason;
-  //wakeup_reason = esp_sleep_get_wakeup_cause();
+  // esp_sleep_wakeup_cause_t wakeup_reason;
+  // wakeup_reason = esp_sleep_get_wakeup_cause();
 
- // uint64_t chipid = ESP.getEfuseMac();                                                        // The chip ID is essentially its MAC address(length: 6 bytes).
- // Serial.printf("***ESP32 Chip ID = %04X%08X\n", (uint16_t)(chipid >> 32), (uint32_t)chipid); // print High 2 bytes
- // char buffer[200];
-  //sprintf(buffer, "%04X%08X", (uint16_t)(chipid >> 32), (uint32_t)chipid);
+  // uint64_t chipid = ESP.getEfuseMac();                                                        // The chip ID is essentially its MAC address(length: 6 bytes).
+  // Serial.printf("***ESP32 Chip ID = %04X%08X\n", (uint16_t)(chipid >> 32), (uint32_t)chipid); // print High 2 bytes
+  // char buffer[200];
+  // sprintf(buffer, "%04X%08X", (uint16_t)(chipid >> 32), (uint32_t)chipid);
   // sprintf(buffer, "esp32%" PRIu64, ESP.getEfuseMac());
 
   // int vbatt_raw = 0;
@@ -144,11 +145,11 @@ void getDevice()
   doc[apNames]["RSSI"] = String(WiFi.RSSI());
   doc[apNames]["type"] = TYPE;
   doc[apNames]["name"] = name;
- // doc[apNames]["chipid"] = buffer;
+  // doc[apNames]["chipid"] = buffer;
   doc[apNames]["bootCount"] = bootCount;
-  //doc[apNames]["wakeup_reason"] = String(wakeup_reason);
-  // doc[apNames]["vbatt_raw"] = vbatt_raw;
-  // doc[apNames]["vbatt"] = map(vbatt_raw, 0, 4096, 0, 4200);
+  // doc[apNames]["wakeup_reason"] = String(wakeup_reason);
+  //  doc[apNames]["vbatt_raw"] = vbatt_raw;
+  //  doc[apNames]["vbatt"] = map(vbatt_raw, 0, 4096, 0, 4200);
 }
 
 void setup()
