@@ -56,7 +56,8 @@ const long interval = 10000;
 unsigned long previousMillis = 0; // will store last time DHT was updated
 #define OTA_HOSTNAME ""           // Leave empty for esp8266-[ChipID]
 
-#define WIFI_MANAGER_STATION_NAME "" // Leave e mpty for auto generated name ESP + ChipID
+// Assuming WIFI_MANAGER_STATION_NAME is defined as a string
+std::string WIFI_MANAGER_STATION_NAME = "";
 
 void setup_wifi_manager()
 {
@@ -94,13 +95,28 @@ void POSTData()
   {
 #if defined(ESP8266)
     // X509List cert("0A:C5:5E:61:CD:83:C4:B1:12:16:5D:61:41:6D:C9:C8:CA:7A:F9:D8");
-    BearSSL::WiFiClientSecure client;
-    client.setFingerprint("0A:C5:5E:61:CD:83:C4:B1:12:16:5D:61:41:6D:C9:C8:CA:7A:F9:D8");
-    client.setTrustAnchors(new BearSSL::X509List(test_root_ca));
+    // BearSSL::WiFiClientSecure client;
+    std::unique_ptr<BearSSL::WiFiClientSecure> client(new BearSSL::WiFiClientSecure);
+    client->setFingerprint("0A:C5:5E:61:CD:83:C4:B1:12:16:5D:61:41:6D:C9:C8:CA:7A:F9:D8");
+    client->setTrustAnchors(new BearSSL::X509List(test_root_ca));
+    // Ignore SSL certificate validation
+    client->setInsecure();
+    if (!client->connect(serverName, 443))
+    {
+      Serial.println(" not connected!");
+      // return;
+    }
+    else
+    {
+      Serial.println("  connected!  to mongo db");
+    }
+    HTTPClient http;
+
+    http.begin(*client, serverName);
+
 #elif defined(ESP32)
     WiFiClientSecure client;
     client.setCACert(test_root_ca);
-#endif
     if (!client.connect(serverName, 443))
     {
       Serial.println(" not connected!");
@@ -109,6 +125,8 @@ void POSTData()
     HTTPClient http;
 
     http.begin(client, serverName);
+#endif
+
     http.addHeader("Content-Type", "application/json");
 
     String json;
