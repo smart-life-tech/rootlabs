@@ -230,7 +230,7 @@ void loop()
     }
     for (int i = 0; i < 10; i++)
     {
-      buffer_arr[i] = analogRead(33);
+      buffer_arr[i] = analogRead(A0);
       delay(30);
     }
     for (int i = 0; i < 9; i++)
