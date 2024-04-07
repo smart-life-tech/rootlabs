@@ -254,7 +254,7 @@ void loop()
     // Serial.println(ph_act);
     delay(1000);
     // Serial.println(Firebase.RTDB.setFloat(&fbdo, macAdd + "/phVal", ph_act));
-    doc[apNames]["phVal"] = ph_act;
+    doc[apNames]["phVal"] = abs(ph_act);
     // Serial.println("status: " + fbdo.errorReason());
     Serial.println(ph_act);
     POSTData();
