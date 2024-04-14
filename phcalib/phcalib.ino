@@ -37,6 +37,6 @@ void loop()
     Serial.print(collectedValue, 2);
     Serial.println(" ");
     digitalWrite(13, HIGH);
-    delay(800);
+    delay(4000);
     digitalWrite(13, LOW);
 }
