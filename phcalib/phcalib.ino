@@ -1,4 +1,4 @@
-#define phSensorPin 0         // the pH meter Analog output is connected with the Arduino’s Analog
+#define phSensorPin A0         // the pH meter Analog output is connected with the Arduino’s Analog
 unsigned long int avgValue; // Store the average value of the sensor feedback
 float b;
 int temporarData[10], temp;
@@ -35,6 +35,9 @@ void loop()
     collectedValue = 3.5 * collectedValue;                          // convert the millivolt into pH value
     Serial.print("    pH:");
     Serial.print(collectedValue, 2);
+    Serial.print(" ");
+    Serial.print("    raw reading pH:");
+    Serial.print(analogRead(phSensorPin), 2);
     Serial.println(" ");
     digitalWrite(13, HIGH);
     delay(4000);
