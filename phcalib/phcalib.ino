@@ -37,7 +37,7 @@ void loop()
     Serial.print(collectedValue, 2);
     Serial.print(" ");
     Serial.print("    raw reading pH:");
-    Serial.print(analogRead(phSensorPin), 2);
+    Serial.print(analogRead(phSensorPin));
     Serial.println(" ");
     digitalWrite(13, HIGH);
     delay(4000);
