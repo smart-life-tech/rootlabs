@@ -250,7 +250,7 @@ void loop()
       avgValue += temporarData[i];
     float collectedValue = (float)avgValue * 5.0 / 1023 / 6; // convert the analog into millivolt
     float voltage = collectedValue;
-    collectedValue = 14 - (1.9 * collectedValue) + 1.5; // convert the millivolt into pH value
+    collectedValue = 14 - (2.5 * collectedValue) + 1.5; // convert the millivolt into pH value
     Serial.print("pH Val:");
     Serial.println(collectedValue);
     delay(1000);
