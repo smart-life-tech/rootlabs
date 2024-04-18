@@ -42,7 +42,7 @@ void loop()
     Serial.print(" ");
     Serial.print(" voltage mV:");
     Serial.print(voltage);
-    int pH_Value = analogRead(A0);
+    float pH_Value = analogRead(A0);
     float Voltage = pH_Value * (5.0 / 1023.0);
     Serial.print(" voltage mV raw:");
     Serial.println(Voltage);
