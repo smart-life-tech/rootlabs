@@ -24,7 +24,7 @@
 // Variable as required in source
 bool signupOK = false;
 int buffer_arr[20], temp = 0;
-float calibration_value = 13.44;
+float calibration_value = 0;
 int phval = 0;
 unsigned long int avgval;
 String macAdd = "";
@@ -249,7 +249,7 @@ void loop()
     for (int i = 2; i < 8; i++)
       avgval += buffer_arr[i];
     float volt = (float)avgval * 5.0 / 1024 / 6;
-    float ph_act = -5.70 * volt + calibration_value;
+    float ph_act = 3.50 * volt + calibration_value;
     Serial.print("pH Val:");
     // Serial.println(ph_act);
     delay(1000);
