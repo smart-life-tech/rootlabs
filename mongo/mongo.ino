@@ -28,7 +28,7 @@ float calibration_value = 0;
 int phval = 0;
 unsigned long int avgval;
 String macAdd = "";
-
+unsigned long int avgValue; // Store the average value of the sensor feedback
 int bootCount = 0;
 char name[15] = CLIENT;
 // int LED_BUILTIN = 4;
@@ -228,35 +228,36 @@ void loop()
       doc[apNames]["humidity"] = h;
       Serial.println(h);
     }
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < 10; i++) // Get 10 sample value from the sensor for smooth the value
     {
-      buffer_arr[i] = analogRead(A0);
-      delay(30);
+      temporarData[i] = analogRead(phSensorPin);
+      delay(10);
     }
-    for (int i = 0; i < 9; i++)
+    for (int i = 0; i < 9; i++) // sort the analog from small to large
     {
       for (int j = i + 1; j < 10; j++)
       {
-        if (buffer_arr[i] > buffer_arr[j])
+        if (temporarData[i] > temporarData[j])
         {
-          temp = buffer_arr[i];
-          buffer_arr[i] = buffer_arr[j];
-          buffer_arr[j] = temp;
+          temp = temporarData[i];
+          temporarData[i] = temporarData[j];
+          temporarData[j] = temp;
         }
       }
     }
-    avgval = 0;
-    for (int i = 2; i < 8; i++)
-      avgval += buffer_arr[i];
-    float volt = (float)avgval * 5.0 / 1024 / 6;
-    float ph_act = 3.50 * volt + calibration_value;
+    avgValue = 0;
+    for (int i = 2; i < 8; i++) // take the average value of 6 center sample
+      avgValue += temporarData[i];
+    float collectedValue = (float)avgValue * 5.0 / 1023 / 6; // convert the analog into millivolt
+    float voltage = collectedValue;
+    collectedValue = 14 - (1.9 * collectedValue) + 1.5; // convert the millivolt into pH value
     Serial.print("pH Val:");
-    // Serial.println(ph_act);
+    Serial.println(collectedValue);
     delay(1000);
     // Serial.println(Firebase.RTDB.setFloat(&fbdo, macAdd + "/phVal", ph_act));
-    doc[apNames]["phVal"] = abs(ph_act);
+    doc[apNames]["phVal"] = abs(collectedValue);
     // Serial.println("status: " + fbdo.errorReason());
-    Serial.println(ph_act);
+    
     POSTData();
   }
 }
