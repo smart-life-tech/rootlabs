@@ -33,9 +33,10 @@ int bootCount = 0;
 char name[15] = CLIENT;
 // int LED_BUILTIN = 4;
 StaticJsonDocument<500> doc;
-
+float b;
+int temporarData[10];
 #define DHTPIN 2 // Digital pin connected to the DHT sensor
-
+#define phSensorPin A0
 // Uncomment the type of sensor in use:
 #define DHTTYPE DHT11 // DHT 11
 // #define DHTTYPE    DHT22     // DHT 22 (AM2302)
@@ -137,7 +138,50 @@ void POSTData()
     Serial.println(httpResponseCode);
   }
 }
-
+float readPH()
+{
+  for (int i = 0; i < 10; i++) // Get 10 sample value from the sensor for smooth the value
+  {
+    temporarData[i] = analogRead(phSensorPin);
+    delay(10);
+  }
+  for (int i = 0; i < 9; i++) // sort the analog from small to large
+  {
+    for (int j = i + 1; j < 10; j++)
+    {
+      if (temporarData[i] > temporarData[j])
+      {
+        temp = temporarData[i];
+        temporarData[i] = temporarData[j];
+        temporarData[j] = temp;
+      }
+    }
+  }
+  avgValue = 0;
+  for (int i = 2; i < 8; i++) // take the average value of 6 center sample
+    avgValue += temporarData[i];
+  float collectedValue = (float)avgValue * 5.0 / 1023 / 6; // convert the analog into millivolt
+  float voltage = collectedValue;
+  collectedValue = 14 - (1.9 * collectedValue) + 1.9; // convert the millivolt into pH value
+  if (collectedValue > 8)
+    collectedValue = collectedValue + 3;
+  Serial.print("pH:");
+  Serial.print(collectedValue, 2);
+  Serial.print(" ");
+  Serial.print("    raw reading pH:");
+  Serial.print(analogRead(phSensorPin));
+  /*Serial.print(" ");
+  Serial.print(" voltage mV:");
+  Serial.print(voltage);
+  float pH_Value = analogRead(A0);
+  float Voltage = pH_Value * (5.0 / 1023.0);
+  float ph_act = -5.60 * voltage + calibration_value;
+  Serial.print(" voltage mV raw:");
+  Serial.print(Voltage);
+  Serial.print("    voltage ph calib: ");
+  Serial.println(ph_act);*/
+  return collectedValue;
+}
 void getDevice()
 {
 
@@ -228,36 +272,15 @@ void loop()
       doc[apNames]["humidity"] = h;
       Serial.println(h);
     }
-    for (int i = 0; i < 10; i++) // Get 10 sample value from the sensor for smooth the value
-    {
-      temporarData[i] = analogRead(phSensorPin);
-      delay(10);
-    }
-    for (int i = 0; i < 9; i++) // sort the analog from small to large
-    {
-      for (int j = i + 1; j < 10; j++)
-      {
-        if (temporarData[i] > temporarData[j])
-        {
-          temp = temporarData[i];
-          temporarData[i] = temporarData[j];
-          temporarData[j] = temp;
-        }
-      }
-    }
-    avgValue = 0;
-    for (int i = 2; i < 8; i++) // take the average value of 6 center sample
-      avgValue += temporarData[i];
-    float collectedValue = (float)avgValue * 5.0 / 1023 / 6; // convert the analog into millivolt
-    float voltage = collectedValue;
-    collectedValue = 14 - (2.5 * collectedValue) + 1.5; // convert the millivolt into pH value
+
     Serial.print("pH Val:");
-    Serial.println(collectedValue);
+    Serial.println(readPH());
     delay(1000);
     // Serial.println(Firebase.RTDB.setFloat(&fbdo, macAdd + "/phVal", ph_act));
-    doc[apNames]["phVal"] = abs(collectedValue);
+    float ph = readPH();
+    doc[apNames]["phVal"] = (ph);
     // Serial.println("status: " + fbdo.errorReason());
-    
+
     POSTData();
   }
 }

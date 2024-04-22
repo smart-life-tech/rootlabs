@@ -49,8 +49,4 @@ void loop()
     Serial.print(Voltage);
     Serial.print("    voltage ph calib: ");
     Serial.println(ph_act);
-    delay(500);
-    digitalWrite(13, HIGH);
-    delay(2000);
-    digitalWrite(13, LOW);
 }
