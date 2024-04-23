@@ -63,7 +63,7 @@ int MUXPinS3 = D7;
 int relay1 = D0; //
 int relay2 = D1; // water, int
 int relay3 = D2; // ph2 , int 2 d3 is water pump
-int relay4 = D2; // ph1 relay, int 1
+int relay4 = D3; // ph1 relay, int 1
                  // Define Trig and Echo pin:
 
 #define trigPin D4
@@ -431,6 +431,7 @@ void POSTData()
 #elif defined(ESP32)
     WiFiClientSecure client;
 #endif
+ client.setCACert(test_root_ca);
     // client.setTrustAnchors(&cert);
     //  if (!client.connect("4D:A1:38:30:EF:83:AA:42:9D:28:C1:0A:0D:BC:C0:EF:BA:39:E3:BC")) {
     if (!client.connect(serverName, 443))
@@ -604,8 +605,9 @@ void setup()
   setup_wifi_manager();
   // Print ESP8266 Local IP Address
   Serial.println(WiFi.localIP());
-  setUpOTA();
-  Serial.begin(115200);
+  //setUpOTA();
+  // Serial.begin(115200);
+  
   pinMode(relay1, OUTPUT);
   pinMode(relay2, OUTPUT);
   pinMode(relay3, OUTPUT);
@@ -617,12 +619,13 @@ void setup()
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
   pinMode(TdsSensorPin, INPUT);
+  
   // delay(2000);
-
+  Serial.println("relay settings done");
   // digitalWrite(relay1, LOW);
   // digitalWrite(relay2, LOW);
   //  digitalWrite(relay3, LOW);
-    digitalWrite(relay4, LOW);
+  digitalWrite(relay4, LOW);
 }
 
 void loop()
