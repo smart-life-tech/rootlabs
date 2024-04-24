@@ -425,13 +425,30 @@ void POSTData()
 // Or, if you happy to ignore the SSL certificate, then use the following line instead:
 //  client->setInsecure();
 #if defined(ESP8266)
-    X509List cert("98:3D:85:9C:9D:70:EF:5A:DC:3C:5C:F4:CA:82:37:77:32:FC:BE:D9");
-    WiFiClientSecure client;
-    client.setFingerprint("98:3D:85:9C:9D:70:EF:5A:DC:3C:5C:F4:CA:82:37:77:32:FC:BE:D9");
+    // X509List cert("0A:C5:5E:61:CD:83:C4:B1:12:16:5D:61:41:6D:C9:C8:CA:7A:F9:D8");
+    // BearSSL::WiFiClientSecure client;
+    std::unique_ptr<BearSSL::WiFiClientSecure> client(new BearSSL::WiFiClientSecure);
+    client->setFingerprint("0A:C5:5E:61:CD:83:C4:B1:12:16:5D:61:41:6D:C9:C8:CA:7A:F9:D8");
+    client->setTrustAnchors(new BearSSL::X509List(test_root_ca));
+    // Ignore SSL certificate validation
+    client->setInsecure();
+    if (!client->connect(serverName, 443))
+    {
+      Serial.println(" not connected!");
+      // return;
+    }
+    else
+    {
+      Serial.println("  connected!  to mongo db");
+    }
+    HTTPClient http;
+
+    http.begin(*client, serverName);
+
 #elif defined(ESP32)
     WiFiClientSecure client;
-#endif
- client.setCACert(test_root_ca);
+
+    client.setCACert(test_root_ca);
     // client.setTrustAnchors(&cert);
     //  if (!client.connect("4D:A1:38:30:EF:83:AA:42:9D:28:C1:0A:0D:BC:C0:EF:BA:39:E3:BC")) {
     if (!client.connect(serverName, 443))
@@ -439,16 +456,13 @@ void POSTData()
       Serial.println("connected!");
       // return;
     }
-    //  if (client.verify("4D:A1:38:30:EF:83:AA:42:9D:28:C1:0A:0D:BC:C0:EF:BA:39:E3:BC", serverName)) {
-    //   Serial.println("certificate matches");
-    //  } else {
-    //   Serial.println("certificate doesn't match");
-    //  }
     HTTPClient http;
     // if (http.begin(*client, serverName, 443))
     // { // HTTPS
 
     http.begin(client, serverName);
+#endif
+
     http.addHeader("Content-Type", "application/json");
 
     String json;
@@ -605,9 +619,9 @@ void setup()
   setup_wifi_manager();
   // Print ESP8266 Local IP Address
   Serial.println(WiFi.localIP());
-  //setUpOTA();
-  // Serial.begin(115200);
-  
+  // setUpOTA();
+  //  Serial.begin(115200);
+
   pinMode(relay1, OUTPUT);
   pinMode(relay2, OUTPUT);
   pinMode(relay3, OUTPUT);
@@ -619,7 +633,7 @@ void setup()
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
   pinMode(TdsSensorPin, INPUT);
-  
+
   // delay(2000);
   Serial.println("relay settings done");
   // digitalWrite(relay1, LOW);
