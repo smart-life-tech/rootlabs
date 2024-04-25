@@ -182,7 +182,7 @@ void setup_wifi_manager()
     // char apNames[30];
     String newMac = "8C:AA:B5:C7:C9:E9"; // enter the mac address here
     newMac.toCharArray(apNames, 30);
-    macAdd.toCharArray(apNames, 30);
+   // macAdd.toCharArray(apNames, 30);
     Serial.println(apNames);
     wifiManager.autoConnect(apNames);
 
@@ -199,7 +199,7 @@ void setup_wifi_manager()
     // char apNames[30];
     String newMac = "8C:AA:B5:C7:C9:E9"; // enter the mac address here
     newMac.toCharArray(apNames, 30);
-    macAdd.toCharArray(apNames, 30);
+   // macAdd.toCharArray(apNames, 30);
     Serial.println(apNames);
     wifiManager.autoConnect(apNames);
 
