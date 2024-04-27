@@ -18,7 +18,7 @@ String inputString = "phVal,6.851097,ph1,1234,ph2,244,water,344";
 #if defined(ESP32)
 #include <WiFi.h>
 #include <AsyncTCP.h>
-#include <WebServer.h> //#include <WebServer.h>
+#include <WebServer.h>  //#include <WebServer.h>
 #include <Hash.h>
 #include <ESPAsyncWebServer.h>
 #include <HTTPClient.h>
@@ -60,23 +60,23 @@ int MUXPinS1 = D7;
 int MUXPinS2 = D7;
 int MUXPinS3 = D7;
 
-int relay1 = D0; //
-int relay2 = D1; // water, int
-int relay3 = D2; // ph2 , int 2 d3 is water pump
-int relay4 = D3; // ph1 relay, int 1
-                 // Define Trig and Echo pin:
+int relay1 = D0;  //
+int relay2 = D1;  // water, int
+int relay3 = D2;  // ph2 , int 2 d3 is water pump
+int relay4 = D3;  // ph1 relay, int 1
+                  // Define Trig and Echo pin:
 
 #define trigPin D4
 #define echoPin D5
-                 // wire (multiplexor)EN to (ESP)GND, SIG to A0, VCC to 3v3 and GND to GND
+                  // wire (multiplexor)EN to (ESP)GND, SIG to A0, VCC to 3v3 and GND to GND
 #endif
 #define UPDATE_SIZE_UNKNOWN 0xFFFFFFFF
 #include <WiFiManager.h>
 // #include <Adafruit_Sensor.h>
 // #include <DHT.h>
-unsigned long relayStartTimes[3] = {0}; // Array to store the start times of relay operations
-bool relayActive[3] = {false};          // Flags to indicate if relays are currently active
-
+unsigned long relayStartTimes[3] = { 0 };  // Array to store the start times of relay operations
+bool relayActive[3] = { false };           // Flags to indicate if relays are currently active
+String json;
 int phval = 0;
 float values[5];
 int phRaw = values[0];
@@ -106,10 +106,10 @@ char name[15] = CLIENT;
 // int LED_BUILTIN = 4;
 StaticJsonDocument<1000> doc;
 
-#define DHTPIN 2 // Digital pin connected to the DHT sensor
+#define DHTPIN 2  // Digital pin connected to the DHT sensor
 
 // Uncomment the type of sensor in use:
-#define DHTTYPE DHT11 // DHT 11
+#define DHTTYPE DHT11  // DHT 11
 bool toggle = HIGH;
 // DHT object
 // DHT dht(DHTPIN, DHTTYPE);
@@ -123,66 +123,57 @@ const long interval = 8000;
 
 // Generally, you should use "unsigned long" for variables that hold time
 // The value will quickly become too large for an int to store
-unsigned long previousMillis = 0; // will store last time DHT was updated
-#define OTA_HOSTNAME ""           // Leave empty for esp8266-[ChipID]
+unsigned long previousMillis = 0;  // will store last time DHT was updated
+#define OTA_HOSTNAME ""            // Leave empty for esp8266-[ChipID]
 
-#define WIFI_MANAGER_STATION_NAME "" // Leave e mpty for auto generated name ESP + ChipID
+#define WIFI_MANAGER_STATION_NAME ""  // Leave e mpty for auto generated name ESP + ChipID
 #define TdsSensorPin A0
-#define VREF 5.0  // analog reference voltage(Volt) of the ADC
-#define SCOUNT 30 // sum of sample point
+#define VREF 5.0   // analog reference voltage(Volt) of the ADC
+#define SCOUNT 30  // sum of sample point
 
-int analogBuffer[SCOUNT]; // store the analog value in the array, read from ADC
+int analogBuffer[SCOUNT];  // store the analog value in the array, read from ADC
 int analogBufferTemp[SCOUNT];
 int analogBufferIndex = 0;
 int copyIndex = 0;
 
 float averageVoltage = 0;
-float temperature = 16; // current temperature for compensation
+float temperature = 16;  // current temperature for compensation
 
 // median filtering algorithm
-int getMedianNum(int bArray[], int iFilterLen)
-{
+int getMedianNum(int bArray[], int iFilterLen) {
   int bTab[iFilterLen];
   for (byte i = 0; i < iFilterLen; i++)
     bTab[i] = bArray[i];
   int i, j, bTemp;
-  for (j = 0; j < iFilterLen - 1; j++)
-  {
-    for (i = 0; i < iFilterLen - j - 1; i++)
-    {
-      if (bTab[i] > bTab[i + 1])
-      {
+  for (j = 0; j < iFilterLen - 1; j++) {
+    for (i = 0; i < iFilterLen - j - 1; i++) {
+      if (bTab[i] > bTab[i + 1]) {
         bTemp = bTab[i];
         bTab[i] = bTab[i + 1];
         bTab[i + 1] = bTemp;
       }
     }
   }
-  if ((iFilterLen & 1) > 0)
-  {
+  if ((iFilterLen & 1) > 0) {
     bTemp = bTab[(iFilterLen - 1) / 2];
-  }
-  else
-  {
+  } else {
     bTemp = (bTab[iFilterLen / 2] + bTab[iFilterLen / 2 - 1]) / 2;
   }
   return bTemp;
 }
-void setup_wifi_manager()
-{
+void setup_wifi_manager() {
 
   WiFiManager wifiManager;
   // wifiManager.resetSettings();
-  if (WIFI_MANAGER_STATION_NAME == "")
-  {
+  if (WIFI_MANAGER_STATION_NAME == "") {
     // use this for auto generated name ESP + ChipID
     macAdd = WiFi.macAddress();
     // WIFI_MANAGER_STATION_NAME = macAdd;
     // char  * apNames = macAdd.c_str();
     // char apNames[30];
-    String newMac = "8C:AA:B5:C7:C9:E9"; // enter the mac address here
+    String newMac = "8C:AA:B5:7F:62:2F";  // enter the mac address here
     newMac.toCharArray(apNames, 30);
-   // macAdd.toCharArray(apNames, 30);
+    // macAdd.toCharArray(apNames, 30);
     Serial.println(apNames);
     wifiManager.autoConnect(apNames);
 
@@ -191,15 +182,14 @@ void setup_wifi_manager()
     // doc["device"]["APname"] = apNames;
   }
 
-  else
-  {
+  else {
     macAdd = WiFi.macAddress();
     // WIFI_MANAGER_STATION_NAME = macAdd;
     // char  * apNames = macAdd.c_str();
     // char apNames[30];
-    String newMac = "8C:AA:B5:C7:C9:E9"; // enter the mac address here
+    String newMac = "8C:AA:B5:7F:62:2F";  // enter the mac address here
     newMac.toCharArray(apNames, 30);
-   // macAdd.toCharArray(apNames, 30);
+    // macAdd.toCharArray(apNames, 30);
     Serial.println(apNames);
     wifiManager.autoConnect(apNames);
 
@@ -208,70 +198,55 @@ void setup_wifi_manager()
   }
 }
 
-void setUpOTA()
-{
+void setUpOTA() {
   /*use mdns for host name resolution*/
-  if (!MDNS.begin(host))
-  { // http://esp32.local
+  if (!MDNS.begin(host)) {  // http://esp32.local
     Serial.println("Error setting up MDNS responder!");
-    while (1)
-    {
+    while (1) {
       delay(1000);
     }
   }
   Serial.println("mDNS responder started");
   /*return index page which is stored in serverIndex */
-  server.on("/", HTTP_GET, []()
-            {
+  server.on("/", HTTP_GET, []() {
     server.sendHeader("Connection", "close");
-    server.send(200, "text/html", loginIndex); });
-  server.on("/serverIndex", HTTP_GET, []()
-            {
+    server.send(200, "text/html", loginIndex);
+  });
+  server.on("/serverIndex", HTTP_GET, []() {
     server.sendHeader("Connection", "close");
-    server.send(200, "text/html", serverIndex); });
+    server.send(200, "text/html", serverIndex);
+  });
   /*handling uploading firmware file */
   server.on(
-      "/update", HTTP_POST, []()
-      {
+    "/update", HTTP_POST, []() {
       server.sendHeader("Connection", "close");
       server.send(200, "text/plain", (Update.hasError()) ? "FAIL" : "OK");
-      ESP.restart(); },
-      []()
-      {
-        HTTPUpload &upload = server.upload();
-        if (upload.status == UPLOAD_FILE_START)
-        {
-          Serial.printf("Update: %s\n", upload.filename.c_str());
-          if (!Update.begin(UPDATE_SIZE_UNKNOWN))
-          { // start with max available size
-            Update.printError(Serial);
-          }
+      ESP.restart();
+    },
+    []() {
+      HTTPUpload &upload = server.upload();
+      if (upload.status == UPLOAD_FILE_START) {
+        Serial.printf("Update: %s\n", upload.filename.c_str());
+        if (!Update.begin(UPDATE_SIZE_UNKNOWN)) {  // start with max available size
+          Update.printError(Serial);
         }
-        else if (upload.status == UPLOAD_FILE_WRITE)
-        {
-          /* flashing firmware to ESP*/
-          if (Update.write(upload.buf, upload.currentSize) != upload.currentSize)
-          {
-            Update.printError(Serial);
-          }
+      } else if (upload.status == UPLOAD_FILE_WRITE) {
+        /* flashing firmware to ESP*/
+        if (Update.write(upload.buf, upload.currentSize) != upload.currentSize) {
+          Update.printError(Serial);
         }
-        else if (upload.status == UPLOAD_FILE_END)
-        {
-          if (Update.end(true))
-          { // true to set the size to the current progress
-            Serial.printf("Update Success: %u\nRebooting...\n", upload.totalSize);
-          }
-          else
-          {
-            Update.printError(Serial);
-          }
+      } else if (upload.status == UPLOAD_FILE_END) {
+        if (Update.end(true)) {  // true to set the size to the current progress
+          Serial.printf("Update Success: %u\nRebooting...\n", upload.totalSize);
+        } else {
+          Update.printError(Serial);
         }
-      });
+      }
+    });
   server.begin();
 }
 
-void processString(String input)
-{
+void processString(String input) {
   char inputCharArray[input.length() + 1];
   input.toCharArray(inputCharArray, sizeof(inputCharArray));
 
@@ -280,67 +255,40 @@ void processString(String input)
   char *value;
 
   token = strtok(inputCharArray, ",");
-  while (token != NULL)
-  {
+  while (token != NULL) {
     key = token;
     token = strtok(NULL, ",");
-    if (token != NULL)
-    {
+    if (token != NULL) {
       value = token;
 
       // Process the key-value pair and assign the value to the appropriate global variable
-      if (strcmp(key, "phVal") == 0)
-      {
+      if (strcmp(key, "phVal") == 0) {
         phVal = value;
         Serial.println(phVal);
-      }
-      else if (strcmp(key, "ph1") == 0)
-      {
-        ph1 = atof(value); // Convert to float
-      }
-      else if (strcmp(key, "ph2") == 0)
-      {
-        ph2 = atol(value); // Convert to long integer
-      }
-      else if (strcmp(key, "water") == 0)
-      {
-        water = atol(value); // Convert to long integer
-      }
-      else if (strcmp(key, "water2") == 0)
-      {
-        water2 = atol(value); // Convert to long integer
-      }
-      else if (strcmp(key, "pump1") == 0)
-      {
-        pump1 = atol(value); // Convert to long integer
-      }
-      else if (strcmp(key, "pump2") == 0)
-      {
-        pump2 = atol(value); // Convert to long integer
-      }
-      else if (strcmp(key, "pump3") == 0)
-      {
-        pump3 = atol(value); // Convert to long integer
-      }
-      else if (strcmp(key, "timer1") == 0)
-      {
-        timer1 = atol(value); // Convert to long integer
-      }
-      else if (strcmp(key, "timer2") == 0)
-      {
-        timer2 = atol(value); // Convert to long integer
-      }
-      else if (strcmp(key, "timer3") == 0)
-      {
-        timer3 = atol(value); // Convert to long integer
-      }
-      else if (strcmp(key, "height") == 0)
-      {
-        height = atol(value); // Convert to long integer
-      }
-      else if (strcmp(key, "pump") == 0)
-      {
-        pump = atol(value); // Convert to long integer
+      } else if (strcmp(key, "ph1") == 0) {
+        ph1 = atof(value);  // Convert to float
+      } else if (strcmp(key, "ph2") == 0) {
+        ph2 = atol(value);  // Convert to long integer
+      } else if (strcmp(key, "water") == 0) {
+        water = atol(value);  // Convert to long integer
+      } else if (strcmp(key, "water2") == 0) {
+        water2 = atol(value);  // Convert to long integer
+      } else if (strcmp(key, "pump1") == 0) {
+        pump1 = atol(value);  // Convert to long integer
+      } else if (strcmp(key, "pump2") == 0) {
+        pump2 = atol(value);  // Convert to long integer
+      } else if (strcmp(key, "pump3") == 0) {
+        pump3 = atol(value);  // Convert to long integer
+      } else if (strcmp(key, "timer1") == 0) {
+        timer1 = atol(value);  // Convert to long integer
+      } else if (strcmp(key, "timer2") == 0) {
+        timer2 = atol(value);  // Convert to long integer
+      } else if (strcmp(key, "timer3") == 0) {
+        timer3 = atol(value);  // Convert to long integer
+      } else if (strcmp(key, "height") == 0) {
+        height = atol(value);  // Convert to long integer
+      } else if (strcmp(key, "pump") == 0) {
+        pump = atol(value);  // Convert to long integer
       }
     }
     token = strtok(NULL, ",");
@@ -350,74 +298,56 @@ void processString(String input)
   relayStartTimes[2] = timer3;
 }
 
-void checkAndControlRelays()
-{
+void checkAndControlRelays() {
   unsigned long currentTime = millis();
 
-  for (int i = 0; i < 3; i++)
-  {
-    if (i == 0 && pump1 > 5 && currentTime - relayStartTimes[i] >= timer1 * 1000)
-    {
+  for (int i = 0; i < 3; i++) {
+    if (i == 0 && pump1 > 5 && currentTime - relayStartTimes[i] >= timer1 * 1000) {
       Serial.println("relay 1 deactivated at " + String(currentTime));
       //  relayActive[i] = false;
-      digitalWrite(relay1, LOW); // Deactivate relay1
-    }
-    else if (i == 1 && pump2 > 5 && currentTime - relayStartTimes[i] >= timer2 * 1000)
-    {
+      digitalWrite(relay1, LOW);  // Deactivate relay1
+    } else if (i == 1 && pump2 > 5 && currentTime - relayStartTimes[i] >= timer2 * 1000) {
       Serial.println("relay 2 deactivated at " + String(currentTime));
       // relayActive[i] = false;
-      digitalWrite(relay2, LOW); // Deactivate relay2
-    }
-    else if (i == 2 && pump3 > 5 && currentTime - relayStartTimes[i] >= timer3 * 1000)
-    {
+      digitalWrite(relay2, LOW);  // Deactivate relay2
+    } else if (i == 2 && pump3 > 5 && currentTime - relayStartTimes[i] >= timer3 * 1000) {
       Serial.println("relay 3 deactivated at " + String(currentTime));
       // relayActive[i] = false;
-      digitalWrite(relay3, LOW); // Deactivate relay3
+      digitalWrite(relay3, LOW);  // Deactivate relay3
     }
   }
 
-  if (pump1 > 5 && !relayActive[0])
-  {
+  if (pump1 > 5 && !relayActive[0]) {
     Serial.println("relay 1 activated at " + String(currentTime));
     relayActive[0] = true;
     relayStartTimes[0] = currentTime;
-    digitalWrite(relay1, HIGH); // Activate relay1
-  }
-  else if (pump1 < 3)
-  {
+    digitalWrite(relay1, HIGH);  // Activate relay1
+  } else if (pump1 < 3) {
     relayActive[0] = false;
   }
 
-  if (pump2 > 5 && !relayActive[1])
-  {
+  if (pump2 > 5 && !relayActive[1]) {
     Serial.println("relay 2 activated at " + String(currentTime));
     relayActive[1] = true;
     relayStartTimes[1] = currentTime;
-    digitalWrite(relay2, HIGH); // Activate relay2
-  }
-  else if (pump2 < 3)
-  {
+    digitalWrite(relay2, HIGH);  // Activate relay2
+  } else if (pump2 < 3) {
     relayActive[1] = false;
   }
 
-  if (pump3 > 5 && !relayActive[2])
-  {
+  if (pump3 > 5 && !relayActive[2]) {
     Serial.println("relay 3 activated at " + String(currentTime));
     relayActive[2] = true;
     relayStartTimes[2] = currentTime;
-    digitalWrite(relay3, HIGH); // Activate relay3
-  }
-  else if (pump3 < 3)
-  {
+    digitalWrite(relay3, HIGH);  // Activate relay3
+  } else if (pump3 < 3) {
     relayActive[2] = false;
   }
 }
 
-void POSTData()
-{
+void POSTData() {
 
-  if (WiFi.status() == WL_CONNECTED)
-  {
+  if (WiFi.status() == WL_CONNECTED) {
     digitalWrite(wifiLed, HIGH);
 
 // std::unique_ptr<BearSSL::WiFiClientSecure> client(new BearSSL::WiFiClientSecure);
@@ -432,27 +362,23 @@ void POSTData()
     client->setTrustAnchors(new BearSSL::X509List(test_root_ca));
     // Ignore SSL certificate validation
     client->setInsecure();
-    if (!client->connect(serverName, 443))
-    {
+    if (!client->connect(serverName, 443)) {
       Serial.println(" not connected!");
       // return;
-    }
-    else
-    {
+    } else {
       Serial.println("  connected!  to mongo db");
     }
     HTTPClient http;
 
     http.begin(*client, serverName);
-
+    Serial.println("http client started!");
 #elif defined(ESP32)
     WiFiClientSecure client;
 
     client.setCACert(test_root_ca);
     // client.setTrustAnchors(&cert);
     //  if (!client.connect("4D:A1:38:30:EF:83:AA:42:9D:28:C1:0A:0D:BC:C0:EF:BA:39:E3:BC")) {
-    if (!client.connect(serverName, 443))
-    {
+    if (!client.connect(serverName, 443)) {
       Serial.println("connected!");
       // return;
     }
@@ -465,13 +391,14 @@ void POSTData()
 
     http.addHeader("Content-Type", "application/json");
 
-    String json;
+
     serializeJson(doc, json);
 
-    // Serial.println(json);
+    Serial.println(json);
     int httpResponseCode = http.POST(json);
     Serial.print("response :");
     Serial.println(httpResponseCode);
+    delay(1000);
     String response = http.getString();
     Serial.println(response.substring(1, response.length() - 1));
     // phval = (response.substring(1, response.length() - 1).toInt());
@@ -486,87 +413,71 @@ void POSTData()
     Serial.println(ph2);
     Serial.print("water: ");
     Serial.println(water);
-    if (pump1 < 7)
-    {
+    if (pump1 < 7) {
       /* iF WaterLevel falls below point A activate pump 3
               IF PHLevel falls below point A activate pump 1
               IF PHLevel rise above point B activate pump 2
             */
-      if (phVal.toFloat() > ph1)
-      {
-        digitalWrite(relay1, LOW); // relay is to be on here
+      if (phVal.toFloat() > ph1) {
+        digitalWrite(relay1, LOW);  // relay is to be on here
         Serial.println("pump 1 on ph value is higher");
-      }
-      else
-      {
-        digitalWrite(relay1, HIGH); // relay off pump also off
+      } else {
+        digitalWrite(relay1, HIGH);  // relay off pump also off
       }
     }
-    if (pump2 < 7)
-    {
-      if (phVal.toFloat() < ph2)
-      {
+    if (pump2 < 7) {
+      if (phVal.toFloat() < ph2) {
         digitalWrite(relay2, LOW);
         Serial.println("pump 2 on ph value is lower");
-      }
-      else
-      {
+      } else {
         digitalWrite(relay2, HIGH);
       }
     }
-    Serial.println(httpResponseCode);
-    if (httpResponseCode == 200)
-      digitalWrite(dbLed, HIGH);
-    else
-      digitalWrite(dbLed, LOW);
-  }
-  else
-  {
-    digitalWrite(wifiLed, HIGH);
+  //   Serial.println(httpResponseCode);
+  //   if (httpResponseCode == 200)
+  //     digitalWrite(dbLed, HIGH);
+  //   else
+  //     digitalWrite(dbLed, LOW);
+  // } else {
+  //  digitalWrite(wifiLed, HIGH);
   }
 }
 
-void getDevice()
-{
+void getDevice() {
 
   // esp_sleep_wakeup_cause_t wakeup_reason;
-  String wakeup_reason = "1"; // esp_sleep_get_wakeup_cause();
+  String wakeup_reason = "1";  // esp_sleep_get_wakeup_cause();
 
   doc[apNames]["IP"] = String(WiFi.localIP().toString());
-  doc[apNames]["RSSI"] = String(WiFi.RSSI());
-  doc[apNames]["type"] = TYPE;
-  doc[apNames]["name"] = name;
+  // doc[apNames]["RSSI"] = String(WiFi.RSSI());
+  // doc[apNames]["type"] = TYPE;
+  // doc[apNames]["name"] = name;
   // doc[apNames]["chipid"] = buffer;
-  doc[apNames]["bootCount"] = bootCount;
-  doc[apNames]["wakeup_reason"] = String(wakeup_reason);
+  //  doc[apNames]["bootCount"] = bootCount;
+  // doc[apNames]["wakeup_reason"] = String(wakeup_reason);
   // doc[apNames]["vbatt_raw"] = vbatt_raw;
   // doc[apNames]["vbatt"] = map(vbatt_raw, 0, 4096, 0, 4200);
 }
 
-void controlLevel()
-{
+void controlLevel() {
   /* iF WaterLevel falls below point A activate pump 3
       IF PHLevel falls below point A activate pump 1
       IF PHLevel rise above point B activate pump 2
     */
   static unsigned long analogSampleTimepoint = millis();
-  if (millis() - analogSampleTimepoint > 40U)
-  { // every 40 milliseconds,read the analog value from the ADC
+  if (millis() - analogSampleTimepoint > 40U) {  // every 40 milliseconds,read the analog value from the ADC
     analogSampleTimepoint = millis();
-    analogBuffer[analogBufferIndex] = analogRead(TdsSensorPin); // read the analog value and store into the buffer
+    analogBuffer[analogBufferIndex] = analogRead(TdsSensorPin);  // read the analog value and store into the buffer
     analogBufferIndex++;
-    if (analogBufferIndex == SCOUNT)
-    {
+    if (analogBufferIndex == SCOUNT) {
       analogBufferIndex = 0;
     }
   }
 
   static unsigned long printTimepoint = millis();
-  if (millis() - printTimepoint > 800U)
-  {
+  if (millis() - printTimepoint > 800U) {
     printTimepoint = millis();
-    for (copyIndex = 0; copyIndex < SCOUNT; copyIndex++)
-    {
+    for (copyIndex = 0; copyIndex < SCOUNT; copyIndex++) {
       analogBufferTemp[copyIndex] = analogBuffer[copyIndex];
 
       // read the analog value more stable by the median filtering algorithm, and convert to voltage value
@@ -589,8 +500,7 @@ void controlLevel()
   Serial.println("ppm");
 }
 
-float getUltra()
-{
+float getUltra() {
   // Clear the trigPin by setting it LOW:
   digitalWrite(trigPin, LOW);
   delayMicroseconds(5);
@@ -610,8 +520,7 @@ float getUltra()
   return distance;
 }
 
-void setup()
-{
+void setup() {
 
   // Serial port for debugging purposes
   Serial.begin(115200);
@@ -642,9 +551,9 @@ void setup()
   digitalWrite(relay4, LOW);
 }
 
-void loop()
-{
-
+void loop() {
+  doc.clear();
+  json = "";
 #ifdef test
   checkAndControlRelays();
 #endif
@@ -652,34 +561,32 @@ void loop()
   unsigned long currentMillis = millis();
   macAdd = WiFi.macAddress();
   server.handleClient();
-  if (currentMillis - previousMillis >= interval)
-  {
+  if (currentMillis - previousMillis >= interval) {
     getDevice();
     controlLevel();
     phRaw = values[0];
     analog2 = tdsValue;
     delay(1000);
-    float getwater = 0.3937008 * getUltra(); // cm to inches
-    getwater = height - getwater;            // the leftover is the real water height
+    float getwater = 0.3937008 * getUltra();  // cm to inches
+    getwater = height - getwater;             // the leftover is the real water height
     if (getwater > height)
       getwater = height;
     Serial.print("water filled  level value: ");
     Serial.println(getwater);
-    if (pump3 < 7)
-    {
-      if (getwater > pump) // stat pumping at a lower height set from ui
+    if (pump3 < 7) {
+      if (getwater > pump)  // stat pumping at a lower height set from ui
       {
         Serial.println("pump on");
       }
       digitalWrite(relay3, LOW);
-      if (getwater < 5) // so as not to touch the sensor 5 inches minimum 5 inches is the 20 cm to stop pumping
+      if (getwater < 5)  // so as not to touch the sensor 5 inches minimum 5 inches is the 20 cm to stop pumping
       {
         digitalWrite(relay3, HIGH);
       }
       digitalWrite(workingLed, HIGH);
     }
     getwater = getwater + 7;
-    getwater = getwater / height; // the tank wont be 100 percent full on ui if i dont add the 7  inches cut off value to the water height
+    getwater = getwater / height;  // the tank wont be 100 percent full on ui if i dont add the 7  inches cut off value to the water height
     getwater = getwater * 100;
     Serial.print("water filled  level percentage ");
     Serial.println(getwater);
