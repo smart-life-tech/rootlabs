@@ -1,5 +1,7 @@
 // ArduinoJson - Version: 6.13.0
 #include <ArduinoJson.h>
+#include <BearSSLHelpers.h>
+#include <CertStoreBearSSL.h>
 // #include <ArduinoJson.hpp>
 #define test
 #define reals
@@ -65,10 +67,11 @@ int relay2 = D1;  // water, int
 int relay3 = D2;  // ph2 , int 2 d3 is water pump
 int relay4 = D3;  // ph1 relay, int 1
                   // Define Trig and Echo pin:
+const char *fingerprint = "0A:C5:5E:61:CD:83:C4:B1:12:16:5D:61:41:6D:C9:C8:CA:7A:F9:D8";
 
 #define trigPin D4
 #define echoPin D5
-                  // wire (multiplexor)EN to (ESP)GND, SIG to A0, VCC to 3v3 and GND to GND
+// wire (multiplexor)EN to (ESP)GND, SIG to A0, VCC to 3v3 and GND to GND
 #endif
 #define UPDATE_SIZE_UNKNOWN 0xFFFFFFFF
 #include <WiFiManager.h>
@@ -104,7 +107,7 @@ String macAdd = "";
 int bootCount = 0;
 char name[15] = CLIENT;
 // int LED_BUILTIN = 4;
-StaticJsonDocument<1000> doc;
+StaticJsonDocument<5000> doc;
 
 #define DHTPIN 2  // Digital pin connected to the DHT sensor
 
@@ -256,6 +259,7 @@ void processString(String input) {
 
   token = strtok(inputCharArray, ",");
   while (token != NULL) {
+    yield();
     key = token;
     token = strtok(NULL, ",");
     if (token != NULL) {
@@ -346,62 +350,64 @@ void checkAndControlRelays() {
 }
 
 void POSTData() {
-
-  if (WiFi.status() == WL_CONNECTED) {
-    digitalWrite(wifiLed, HIGH);
-
-// std::unique_ptr<BearSSL::WiFiClientSecure> client(new BearSSL::WiFiClientSecure);
-// client->setFingerprint(fingerprint_sni_cloudflaressl_com);
-// Or, if you happy to ignore the SSL certificate, then use the following line instead:
-//  client->setInsecure();
+  yield();
+  Serial.println("posting data");
 #if defined(ESP8266)
-    // X509List cert("0A:C5:5E:61:CD:83:C4:B1:12:16:5D:61:41:6D:C9:C8:CA:7A:F9:D8");
-    // BearSSL::WiFiClientSecure client;
-    std::unique_ptr<BearSSL::WiFiClientSecure> client(new BearSSL::WiFiClientSecure);
-    client->setFingerprint("0A:C5:5E:61:CD:83:C4:B1:12:16:5D:61:41:6D:C9:C8:CA:7A:F9:D8");
-    client->setTrustAnchors(new BearSSL::X509List(test_root_ca));
-    // Ignore SSL certificate validation
-    client->setInsecure();
-    if (!client->connect(serverName, 443)) {
-      Serial.println(" not connected!");
-      // return;
-    } else {
-      Serial.println("  connected!  to mongo db");
-    }
-    HTTPClient http;
 
-    http.begin(*client, serverName);
-    Serial.println("http client started!");
+  // Configure BearSSL
+  // BearSSL::WiFiClientSecure *client = new BearSSL::WiFiClientSecure;
+  //CertStoreBearSSL certStore;
+  WiFiClientSecure client;
+
+  //client.setCACert(test_root_ca);
+  client.setFingerprint(fingerprint);
+  BearSSL::X509List trustAnchors((const uint8_t *)test_root_ca, strlen(test_root_ca));
+  client.setTrustAnchors(&trustAnchors);
+
+  // Ignore SSL certificate validation
+  client.setInsecure();
+
+  // HTTPClient object
+  HTTPClient http;
+
+  // Start HTTP client
+  http.begin(client, serverName);
+  Serial.println("HTTP client started!");
+
 #elif defined(ESP32)
-    WiFiClientSecure client;
+  WiFiClientSecure client;
 
-    client.setCACert(test_root_ca);
-    // client.setTrustAnchors(&cert);
-    //  if (!client.connect("4D:A1:38:30:EF:83:AA:42:9D:28:C1:0A:0D:BC:C0:EF:BA:39:E3:BC")) {
-    if (!client.connect(serverName, 443)) {
-      Serial.println("connected!");
-      // return;
-    }
-    HTTPClient http;
-    // if (http.begin(*client, serverName, 443))
-    // { // HTTPS
+  client.setCACert(test_root_ca);
+  // client.setTrustAnchors(&cert);
+  //  if (!client.connect("4D:A1:38:30:EF:83:AA:42:9D:28:C1:0A:0D:BC:C0:EF:BA:39:E3:BC")) {
+  if (!client.connect(serverName, 443)) {
+    Serial.println("connected!");
+    // return;
+  }
+  HTTPClient http;
+  // if (http.begin(*client, serverName, 443))
+  // { // HTTPS
 
-    http.begin(client, serverName);
+  http.begin(client, serverName);
 #endif
 
-    http.addHeader("Content-Type", "application/json");
+  http.addHeader("Content-Type", "application/json");
 
 
-    serializeJson(doc, json);
+  serializeJson(doc, json);
+  // ESP.wdtEnable(2000);
+  // Serial.println(json);
+  // http.setTimeout(5500);  // 10-second timeout
+  yield();
+  int httpResponseCode = http.POST(json);
+  yield();
+  Serial.print("response :");
+  Serial.println(httpResponseCode);
+  // delay(1000);
 
-    Serial.println(json);
-    int httpResponseCode = http.POST(json);
-    Serial.print("response :");
-    Serial.println(httpResponseCode);
-    delay(1000);
-    String response = http.getString();
-    Serial.println(response.substring(1, response.length() - 1));
-    // phval = (response.substring(1, response.length() - 1).toInt());
+  String response = http.getString();
+  Serial.println(response.substring(1, response.length() - 1));
+  /*  // phval = (response.substring(1, response.length() - 1).toInt());
     processString(response.substring(1, response.length() - 1));
 
     // Now you can use the extracted values in your further code logic
@@ -414,10 +420,10 @@ void POSTData() {
     Serial.print("water: ");
     Serial.println(water);
     if (pump1 < 7) {
-      /* iF WaterLevel falls below point A activate pump 3
-              IF PHLevel falls below point A activate pump 1
-              IF PHLevel rise above point B activate pump 2
-            */
+      // iF WaterLevel falls below point A activate pump 3
+           //   IF PHLevel falls below point A activate pump 1
+            //  IF PHLevel rise above point B activate pump 2
+            
       if (phVal.toFloat() > ph1) {
         digitalWrite(relay1, LOW);  // relay is to be on here
         Serial.println("pump 1 on ph value is higher");
@@ -433,14 +439,8 @@ void POSTData() {
         digitalWrite(relay2, HIGH);
       }
     }
-  //   Serial.println(httpResponseCode);
-  //   if (httpResponseCode == 200)
-  //     digitalWrite(dbLed, HIGH);
-  //   else
-  //     digitalWrite(dbLed, LOW);
-  // } else {
-  //  digitalWrite(wifiLed, HIGH);
-  }
+    }
+   */
 }
 
 void getDevice() {
@@ -521,6 +521,7 @@ float getUltra() {
 }
 
 void setup() {
+  // ESP.wdtEnable(15000);
 
   // Serial port for debugging purposes
   Serial.begin(115200);
@@ -603,7 +604,7 @@ void loop() {
     // save the last time you updated the DHT values
     previousMillis = currentMillis;
     // Read temperature as Celsius (the default)
-
+    Serial.println("debugs");
     POSTData();
   }
 #endif
