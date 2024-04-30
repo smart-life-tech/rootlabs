@@ -3,7 +3,7 @@
 #include <BearSSLHelpers.h>
 #include <CertStoreBearSSL.h>
 // #include <ArduinoJson.hpp>
-#define test
+#define tests
 #define reals
 //  Import required libraries
 #include <Arduino.h>
@@ -40,6 +40,7 @@ int MUXPinS3 = 4;
 // Define Trig and Echo pin:
 #define trigPin 4
 #define echoPin 5
+
 #elif defined(ESP8266)
 #include <ESP8266WiFi.h>
 #include <Hash.h>
@@ -62,10 +63,10 @@ int MUXPinS1 = D7;
 int MUXPinS2 = D7;
 int MUXPinS3 = D7;
 
-int relay1 = D0;  //
-int relay2 = D1;  // water, int
-int relay3 = D2;  // ph2 , int 2 d3 is water pump
-int relay4 = D3;  // ph1 relay, int 1
+int relay1 = D3;  //relay1,int 1
+int relay2 = D1;  // relay2, int 3
+int relay3 = D0;  // pump4
+int relay4 = D2;  // ph1 relay, int 1
                   // Define Trig and Echo pin:
 const char *fingerprint = "0A:C5:5E:61:CD:83:C4:B1:12:16:5D:61:41:6D:C9:C8:CA:7A:F9:D8";
 
@@ -307,22 +308,22 @@ void checkAndControlRelays() {
 
   for (int i = 0; i < 3; i++) {
     if (i == 0 && pump1 > 5 && currentTime - relayStartTimes[i] >= timer1 * 1000) {
-      Serial.println("relay 1 deactivated at " + String(currentTime));
+     // Serial.println("relay 1 deactivated at " + String(currentTime));
       //  relayActive[i] = false;
       digitalWrite(relay1, LOW);  // Deactivate relay1
     } else if (i == 1 && pump2 > 5 && currentTime - relayStartTimes[i] >= timer2 * 1000) {
-      Serial.println("relay 2 deactivated at " + String(currentTime));
+     // Serial.println("relay 2 deactivated at " + String(currentTime));
       // relayActive[i] = false;
       digitalWrite(relay2, LOW);  // Deactivate relay2
     } else if (i == 2 && pump3 > 5 && currentTime - relayStartTimes[i] >= timer3 * 1000) {
-      Serial.println("relay 3 deactivated at " + String(currentTime));
+     // Serial.println("relay 3 deactivated at " + String(currentTime));
       // relayActive[i] = false;
       digitalWrite(relay3, LOW);  // Deactivate relay3
     }
   }
 
   if (pump1 > 5 && !relayActive[0]) {
-    Serial.println("relay 1 activated at " + String(currentTime));
+   // Serial.println("relay 1 activated at " + String(currentTime));
     relayActive[0] = true;
     relayStartTimes[0] = currentTime;
     digitalWrite(relay1, HIGH);  // Activate relay1
@@ -331,7 +332,7 @@ void checkAndControlRelays() {
   }
 
   if (pump2 > 5 && !relayActive[1]) {
-    Serial.println("relay 2 activated at " + String(currentTime));
+   // Serial.println("relay 2 activated at " + String(currentTime));
     relayActive[1] = true;
     relayStartTimes[1] = currentTime;
     digitalWrite(relay2, HIGH);  // Activate relay2
@@ -340,7 +341,7 @@ void checkAndControlRelays() {
   }
 
   if (pump3 > 5 && !relayActive[2]) {
-    Serial.println("relay 3 activated at " + String(currentTime));
+   // Serial.println("relay 3 activated at " + String(currentTime));
     relayActive[2] = true;
     relayStartTimes[2] = currentTime;
     digitalWrite(relay3, HIGH);  // Activate relay3
@@ -407,41 +408,48 @@ void POSTData() {
 
   String response = http.getString();
   Serial.println(response.substring(1, response.length() - 1));
-  /*  // phval = (response.substring(1, response.length() - 1).toInt());
-    processString(response.substring(1, response.length() - 1));
+  // phval = (response.substring(1, response.length() - 1).toInt());
+  processString(response.substring(1, response.length() - 1));
 
-    // Now you can use the extracted values in your further code logic
-    Serial.print("phVal: ");
-    Serial.println(phVal.toFloat());
-    Serial.print("ph1: ");
-    Serial.println(ph1);
-    Serial.print("ph2: ");
-    Serial.println(ph2);
-    Serial.print("water: ");
-    Serial.println(water);
-    if (pump1 < 7) {
-      // iF WaterLevel falls below point A activate pump 3
-           //   IF PHLevel falls below point A activate pump 1
-            //  IF PHLevel rise above point B activate pump 2
-            
-      if (phVal.toFloat() > ph1) {
-        digitalWrite(relay1, LOW);  // relay is to be on here
-        Serial.println("pump 1 on ph value is higher");
-      } else {
-        digitalWrite(relay1, HIGH);  // relay off pump also off
-      }
+  // Now you can use the extracted values in your further code logic
+  Serial.print("phVal: ");
+  Serial.println(phVal.toFloat());
+  Serial.print("ph1: ");
+  Serial.println(ph1);
+  Serial.print("ph2: ");
+  Serial.println(ph2);
+  Serial.print("water: ");
+  Serial.println(water);
+  if (pump1 < 7) {
+    // iF WaterLevel falls below point A activate pump 3
+    //   IF PHLevel falls below point A activate pump 1
+    //  IF PHLevel rise above point B activate pump 2
+
+    //if (phVal.toFloat() > ph1) {
+      digitalWrite(relay1, HIGH);  // relay is to be on here
+      Serial.println("pump 1 on ph value is higher");
+    } else {
+      digitalWrite(relay1, LOW);  // relay off pump also off
     }
-    if (pump2 < 7) {
-      if (phVal.toFloat() < ph2) {
-        digitalWrite(relay2, LOW);
-        Serial.println("pump 2 on ph value is lower");
-      } else {
-        digitalWrite(relay2, HIGH);
-      }
-    }
-    }
-   */
+ // }
+  if (pump2 < 7) {
+   // if (phVal.toFloat() < ph2) {
+      digitalWrite(relay2, HIGH);
+      Serial.println("pump 2 on ph value is lower");
+    } else {
+      digitalWrite(relay2, LOW);
+   // }
+  }
+  if (pump3 < 7) {
+   // if (phVal.toFloat() < ph2) {
+      digitalWrite(relay3, HIGH);
+      Serial.println("pump 3 on ph value is lower");
+    } else {
+      digitalWrite(relay3, LOW);
+   // }
+  }
 }
+
 
 void getDevice() {
 
@@ -536,10 +544,10 @@ void setup() {
   pinMode(relay2, OUTPUT);
   pinMode(relay3, OUTPUT);
   pinMode(relay4, OUTPUT);
-  digitalWrite(relay1, HIGH);
-  digitalWrite(relay2, HIGH);
-  digitalWrite(relay3, HIGH);
-  digitalWrite(relay4, HIGH);
+  digitalWrite(relay1, LOW);
+  digitalWrite(relay2, LOW);
+  digitalWrite(relay3, LOW);
+  digitalWrite(relay4, LOW);
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
   pinMode(TdsSensorPin, INPUT);
