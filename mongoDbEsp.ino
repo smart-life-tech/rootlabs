@@ -446,7 +446,7 @@ void POSTData() {
     digitalWrite(relay1, HIGH);  // relay is to be on here
     Serial.println("pump 1 on ph value is higher");
   } else {
-    // digitalWrite(relay1, LOW);  // relay off pump also off
+     digitalWrite(relay1, LOW);  // relay off pump also off
   }
 
   if (pump2 > 7) {
