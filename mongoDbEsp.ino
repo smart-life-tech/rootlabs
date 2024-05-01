@@ -319,10 +319,10 @@ void checkPhRelays() {  // iF WaterLevel falls below point A activate pump 3
   if (pump2 < 7) {
 
     if (phVal.toFloat() > ph2) {
-      digitalWrite(relay1, HIGH);
+      digitalWrite(relay3, HIGH);
       Serial.println("ph value is high");
     } else {
-      digitalWrite(relay1, LOW);
+      digitalWrite(relay3, LOW);
     }
   }
 }
