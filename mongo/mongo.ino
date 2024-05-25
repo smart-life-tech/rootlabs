@@ -1,5 +1,6 @@
 // Import required libraries
 #include <Arduino.h>
+#include <ArduinoOTA.h>
 #if defined(ESP32)
 #include <WiFi.h>
 #include <AsyncTCP.h>
@@ -7,6 +8,7 @@
 #include <Hash.h>
 #include <ESPAsyncWebServer.h>
 #include <HTTPClient.h>
+WebServer server(80);
 #elif defined(ESP8266)
 #include <ESP8266WiFi.h>
 #include <Hash.h>
@@ -14,6 +16,7 @@
 #include <ESP8266WebServer.h>
 #include <ESP8266HTTPClient.h>
 #include <WiFiClientSecureBearSSL.h>
+ESP8266WebServer server(80);
 #endif
 #include <WiFiManager.h>
 #include <Adafruit_Sensor.h>
@@ -138,6 +141,78 @@ void POSTData()
     Serial.println(httpResponseCode);
   }
 }
+
+void setUpOTA()
+{
+  ArduinoOTA.onStart([]()
+                     {
+    String type;
+    if (ArduinoOTA.getCommand() == U_FLASH) {
+      type = "sketch";
+    } else { // U_SPIFFS
+      type = "filesystem";
+    }
+    // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
+    Serial.println("Start updating " + type); });
+
+  ArduinoOTA.onEnd([]()
+                   { Serial.println("\nEnd"); });
+
+  ArduinoOTA.onProgress([](unsigned int progress, unsigned int total)
+                        { Serial.printf("Progress: %u%%\r", (progress / (total / 100))); });
+
+  ArduinoOTA.onError([](ota_error_t error)
+                     {
+    Serial.printf("Error[%u]: ", error);
+    if (error == OTA_AUTH_ERROR) {
+      Serial.println("Auth Failed");
+    } else if (error == OTA_BEGIN_ERROR) {
+      Serial.println("Begin Failed");
+    } else if (error == OTA_CONNECT_ERROR) {
+      Serial.println("Connect Failed");
+    } else if (error == OTA_RECEIVE_ERROR) {
+      Serial.println("Receive Failed");
+    } else if (error == OTA_END_ERROR) {
+      Serial.println("End Failed");
+    } });
+
+  ArduinoOTA.begin();
+
+  server.on("/", HTTP_GET, []()
+            { server.send(200, "text/html", "<h1>OTA Update</h1><form method='POST' action='/update' enctype='multipart/form-data'><input type='file' name='update'><input type='submit' value='Update'></form>"); });
+
+  server.on("/update", HTTP_POST, []()
+            {
+    server.send(200, "text/plain", (Update.hasError()) ? "Update Failed" : "Update Success! Rebooting...");
+    ESP.restart(); }, []()
+            {
+    HTTPUpload& upload = server.upload();
+    if (upload.status == UPLOAD_FILE_START) {
+      Serial.setDebugOutput(true);
+      //WiFiUDP::stopAll();
+      if (!Update.begin((ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000)) {
+        Update.printError(Serial);
+      }
+    } else if (upload.status == UPLOAD_FILE_WRITE) {
+      if (Update.write(upload.buf, upload.currentSize) != upload.currentSize) {
+        Update.printError(Serial);
+      }
+    } else if (upload.status == UPLOAD_FILE_END) {
+      if (Update.end(true)) {
+        Serial.printf("Update Success: %u bytes\n", upload.totalSize);
+      } else {
+        Update.printError(Serial);
+      }
+      Serial.setDebugOutput(false);
+    }
+    yield(); });
+
+  server.begin();
+  Serial.println("Ready");
+  Serial.print("IP address: ");
+  Serial.println(WiFi.localIP());
+}
+
 float readPH()
 {
     for (int i = 0; i < 10; i++) // Get 10 sample value from the sensor for smooth the value
@@ -219,12 +294,14 @@ void setup()
   Serial.begin(115200);
   dht.begin();
   setup_wifi_manager();
+   setUpOTA();
   // Print ESP8266 Local IP Address
   Serial.println(WiFi.localIP());
 }
 
 void loop()
-{
+{ ArduinoOTA.handle();
+  server.handleClient();
   unsigned long currentMillis = millis();
   macAdd = WiFi.macAddress();
   if (currentMillis - previousMillis >= interval)
