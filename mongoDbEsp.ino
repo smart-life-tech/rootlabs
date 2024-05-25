@@ -328,6 +328,7 @@ void checkPhRelays()
   if (pump2 < 7)
   {
 
+<<<<<<< HEAD
     if (phVal.toFloat() > ph2)
     {
       digitalWrite(relay3, HIGH);
@@ -335,6 +336,12 @@ void checkPhRelays()
     }
     else
     {
+=======
+    if (phVal.toFloat() > ph2) {
+      digitalWrite(relay3, HIGH);
+      Serial.println("ph value is high");
+    } else {
+>>>>>>> 45d1c159cc5710af72ed1efb558cc77ae321923c
       digitalWrite(relay3, LOW);
     }
   }
@@ -547,10 +554,15 @@ void POSTData()
   {
     digitalWrite(relay1, HIGH); // relay is to be on here
     Serial.println("pump 1 on ph value is higher");
+<<<<<<< HEAD
   }
   else
   {
     digitalWrite(relay1, LOW); // relay off pump also off
+=======
+  } else {
+     digitalWrite(relay1, LOW);  // relay off pump also off
+>>>>>>> 45d1c159cc5710af72ed1efb558cc77ae321923c
   }
 
   if (pump2 > 7)
