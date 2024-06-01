@@ -195,7 +195,7 @@ void setup_wifi_manager()
     // WIFI_MANAGER_STATION_NAME = macAdd;
     // char  * apNames = macAdd.c_str();
     // char apNames[30];
-    String newMac = "8C:AA:B5:7F:62:2F," + WiFi.localIP().toString();
+    String newMac = "8C:AA:B5:7F:62:2F";
     newMac.toCharArray(apNames, 30);
     // macAdd.toCharArray(apNames, 30);
     Serial.println(apNames);
@@ -215,7 +215,7 @@ void setup_wifi_manager()
     // WIFI_MANAGER_STATION_NAME = macAdd;
     // char  * apNames = macAdd.c_str();
     // char apNames[30];
-    String newMac = "8C:AA:B5:7F:62:2F," + WiFi.localIP().toString(); // enter the mac address here
+    String newMac = "8C:AA:B5:7F:62:2F"; // enter the mac address here
     newMac.toCharArray(apNames, 30);
     // macAdd.toCharArray(apNames, 30);
     Serial.println(apNames);
