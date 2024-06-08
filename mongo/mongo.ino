@@ -215,47 +215,9 @@ void setUpOTA()
 
 float readPH()
 {
-  for (int i = 0; i < 10; i++) // Get 10 sample value from the sensor for smooth the value
-  {
-    temporarData[i] = analogRead(phSensorPin);
-    delay(10);
-  }
-  for (int i = 0; i < 9; i++) // sort the analog from small to large
-  {
-    for (int j = i + 1; j < 10; j++)
-    {
-      if (temporarData[i] > temporarData[j])
-      {
-        temp = temporarData[i];
-        temporarData[i] = temporarData[j];
-        temporarData[j] = temp;
-      }
-    }
-  }
-  avgValue = 0;
-  for (int i = 2; i < 8; i++) // take the average value of 6 center sample
-    avgValue += temporarData[i];
-  float collectedValue = (float)avgValue * 5.0 / 1023 / 6; // convert the analog into millivolt
-  float voltage = collectedValue;
-  collectedValue = 14 - (1.9 * collectedValue) + 1.5; // convert the millivolt into pH value
-  Serial.print("pH:");
-  Serial.print(collectedValue, 2);
-  Serial.print(" ");
-  Serial.print("    raw reading pH:");
-  Serial.print(analogRead(phSensorPin));
-  Serial.print(" ");
-  Serial.print(" voltage mV:");
-  Serial.print(voltage);
-  /* float pH_Value = analogRead(A0);
-   float Voltage = pH_Value * (5.0 / 1023.0);
-   float ph_act = -5.60 * voltage + calibration_value;
-   Serial.print(" voltage mV raw:");
-   Serial.print(Voltage);
-   Serial.print("    voltage ph calib: ");
-   Serial.println(ph_act);*/
-  int analogReading = analogRead(A0);                                                                                       // Read the analog value from the sensor
-  float pHValue = 1.1139606788501757e-05 * analogReading * analogReading +  0.013737803115719713 * analogReading -0.6248975748906497; // Quadratic conversion
-  
+  int analogReading = analogRead(A0);
+  float pHValue = 1.1139606788501757e-05 * analogReading * analogReading + 0.013737803115719713 * analogReading - 0.6248975748906497; // Quadratic conversion
+
   return pHValue;
 }
 void getDevice()
