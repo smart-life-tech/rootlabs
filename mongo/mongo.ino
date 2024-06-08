@@ -255,7 +255,8 @@ float readPH()
    Serial.println(ph_act);*/
   int analogReading = analogRead(A0);                                                                                       // Read the analog value from the sensor
   float pHValue = 1.1139606788501757e-05 * analogReading * analogReading +  0.013737803115719713 * analogReading -0.6248975748906497; // Quadratic conversion
-  return collectedValue;
+  
+  return pHValue;
 }
 void getDevice()
 {

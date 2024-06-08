@@ -49,10 +49,11 @@ void loop()
     Serial.print(Voltage);
     Serial.print("    voltage ph calib: ");
     Serial.println(ph_act);
-    int analogReading = analogRead(A0);                                                                                              // Read the analog value from the sensor
-                                                                                                                                     // float pHValue = 0.0194 * analogReading - 0.4859;  // Convert the analog value to pH
-    //float pHValue = -0.0003115483257838544 * analogReading * analogReading + 0.20570516936468186 * analogReading - 23.7626644577051; // Quadratic conversion
- float pHValue = -9.963651947265824e-06 * analogReading * analogReading + 0.03148564371250025 * analogReading - 3.0426979282475384; // Quadratic conversion
+    int analogReading = analogRead(A0);                                                                                                 // Read the analog value from the sensor
+                                                                                                                                        // float pHValue = 0.0194 * analogReading - 0.4859;  // Convert the analog value to pH
+                                                                                                                                        // float pHValue = -0.0003115483257838544 * analogReading * analogReading + 0.20570516936468186 * analogReading - 23.7626644577051; // Quadratic conversion
+    float pHValue = 1.1139606788501757e-05 * analogReading * analogReading + 0.013737803115719713 * analogReading - 0.6248975748906497; // Quadratic conversion
+
     Serial.print("Analog Reading: ");
     Serial.print(analogReading);
     Serial.print(" => pH Value: ");
